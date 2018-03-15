@@ -16,6 +16,6 @@ struct Account {
 	int total_deposited;
 	struct Deposit head;
 
-}; // account for each person
+};
 
 #endif

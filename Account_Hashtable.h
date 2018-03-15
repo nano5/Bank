@@ -7,12 +7,13 @@
 #include <stdio.h>
 
 struct Account_Hashtable {
-	int size;
-	struct Account_Bucket **account_arr;
+	unsigned long size;
+	struct Account_Bucket **account_buckets;
+	const struct Account *(*get_account)(struct Account_Hashtable *this, char *key);
 	void (*put_account)(struct Account_Hashtable *this, 
 				 		char *key, 
 				 		struct Account account);
-	const struct Account *(*get_account)(struct Account_Hashtable *this, char *key);
+	void (*delete_Account_Hashtable)(struct Account_Hashtable *this);
 };
 
 struct Account_Bucket {
@@ -21,6 +22,6 @@ struct Account_Bucket {
 	struct Account_Bucket *next;
 };
 
-struct Account_Hashtable *new_Account_Hashtable(int n);
+struct Account_Hashtable *new_Account_Hashtable(unsigned long n);
 #endif
 
