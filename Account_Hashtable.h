@@ -12,13 +12,14 @@ struct Account_Hashtable {
 	const struct Account *(*get_account)(struct Account_Hashtable *this, char *key);
 	void (*put_account)(struct Account_Hashtable *this, 
 				 		char *key, 
-				 		struct Account account);
+				 		struct Account *account);
 	void (*delete_Account_Hashtable)(struct Account_Hashtable *this);
+	void (*print_self)(struct Account_Hashtable *this);
 };
 
 struct Account_Bucket {
 	char *key;
-	struct Account account;
+	struct Account *account;
 	struct Account_Bucket *next;
 };
 

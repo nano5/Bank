@@ -1,12 +1,13 @@
 #include "Account_Hashtable.h"
 
-static unsigned long hash(unsigned char *str);
+static unsigned long hash(char *str);
 static void put_account(struct Account_Hashtable *this, 
 				 char *key, 
-				 struct Account account);
+				 struct Account *account);
 static const struct Account *get_account(struct Account_Hashtable *this,
 				 				  char *key);
 static void delete_Account_Hashtable(struct Account_Hashtable *this);
+static void print_self(struct Account_Hashtable *this);
 
 struct Account_Hashtable *new_Account_Hashtable(unsigned long n) {
 	struct Account_Hashtable *account_hashtable = calloc(1, sizeof(struct Account_Hashtable));
@@ -15,21 +16,23 @@ struct Account_Hashtable *new_Account_Hashtable(unsigned long n) {
 	account_hashtable->put_account = &put_account;
 	account_hashtable->get_account = &get_account;
 	account_hashtable->delete_Account_Hashtable = &delete_Account_Hashtable;
+	account_hashtable->print_self = &print_self;
 	return account_hashtable;
 }
 
 static void delete_Account_Hashtable(struct Account_Hashtable *this) {
-	struct Account_Bucket *bucket;
+	struct Account_Bucket *account_bucket;
 	struct Account_Bucket *next;
 
 	for (int i = 0; i < this->size; ++i) {
-		bucket = this->account_buckets[i];
+		account_bucket = this->account_buckets[i];
 
-		while (bucket != NULL) {
-			free(bucket->key);
-			next = bucket->next;
-			free(bucket);
-			bucket = next;
+		while (account_bucket != NULL) {
+			free(account_bucket->key);
+			next = account_bucket->next;
+			account_bucket->account->delete_Account(account_bucket->account);
+			free(account_bucket);
+			account_bucket = next;
 		}
 	}
 
@@ -39,14 +42,14 @@ static void delete_Account_Hashtable(struct Account_Hashtable *this) {
 
 static void put_account(struct Account_Hashtable *this, 
 				 char *key, 
-				 struct Account account) {
-	unsigned long index = hash((unsigned char *)key) % this->size;
+				 struct Account *account) {
+	unsigned long index = hash(key) % this->size;
 	struct Account_Bucket *head = this->account_buckets[index];
-	struct Account_Bucket *account_bucket = (struct Account_Bucket *) malloc(sizeof(struct Account_Bucket));
+	struct Account_Bucket *account_bucket = (struct Account_Bucket *) calloc(1, sizeof(struct Account_Bucket));
 	struct Account_Bucket *temp_account_bucket = head;
 	account_bucket->account = account;
 	account_bucket->next = NULL;
-	account_bucket->key = malloc(sizeof(char) * strlen(key));
+	account_bucket->key = calloc(strlen(key) + 1, sizeof(char));
 	strcpy(account_bucket->key, key);
 	
 	if (head == NULL) {
@@ -73,26 +76,39 @@ static void put_account(struct Account_Hashtable *this,
 
 static const struct Account *get_account(struct Account_Hashtable *this,
 				 				  char *key)	{
-	unsigned long index = hash((unsigned char *)key) % this->size;
-	struct Account_Bucket *head = this->account_buckets[index];
+	unsigned long index = hash(key) % this->size;
+	struct Account_Bucket *account_bucket = this->account_buckets[index];
 
-	while(head != NULL) {
-		if (strcmp(head->key, key) == 0) {
-			return &head->account;
+	while(account_bucket != NULL) {
+		if (strcmp(account_bucket->key, key) == 0) {
+			return account_bucket->account;
 		}
-		head = head->next;
+		account_bucket = account_bucket->next;
 	}
 	return NULL;
 }
 
-static unsigned long hash(unsigned char *str)
-{
-    unsigned long hash = 5381;
-    int c;
+static void print_self(struct Account_Hashtable *this) {
+	for (int i = 0; i < this->size; ++i) {
+		struct Account_Bucket *account_bucket = this->account_buckets[i];
+		printf("array_index: %d\n", i);
+		while(account_bucket != NULL) {
+			printf("key: %s\n", account_bucket->key);
+			account_bucket = account_bucket->next;
+		}
 
-    while ((c = (*str)))
-    	++str;
-        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+	}
+}
+
+static unsigned long hash(char *str) {
+    unsigned long hash = 5381;
+    int size = strlen(str);
+
+    for (int i = 0; i < size; ++i) {
+        hash = ((hash << 5) + hash) + str[i];
+    }
 
     return hash;
 }
+
+  
