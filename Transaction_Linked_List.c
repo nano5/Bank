@@ -13,6 +13,7 @@ struct Transaction_Linked_List *create_transaction_linked_list() {
 	transaction_linked_list->size = 0;
 	transaction_linked_list->head = NULL;
 	transaction_linked_list->tail = NULL;
+	transaction_linked_list->delete_transaction_linked_list = &delete_transaction_linked_list;
 	transaction_linked_list->insert = &insert;
 	transaction_linked_list->remove = &my_remove;
 	transaction_linked_list->add = &add;
@@ -21,7 +22,19 @@ struct Transaction_Linked_List *create_transaction_linked_list() {
 }
 
 static void delete_transaction_linked_list(struct Transaction_Linked_List *this) {
+	if (this == NULL) {
+		return;
+	}
+
 	struct Transaction_Bucket *transaction_bucket = this->head;
+	struct Transaction_Bucket *next = NULL;
+
+	while (transaction_bucket != NULL) {
+		next = transaction_bucket->next;
+		free(transaction_bucket);
+		transaction_bucket = next;
+	}
+	free(this);
 }
 
 static void insert(struct Transaction_Linked_List *this, const struct Transaction *transaction, int index) {
@@ -47,6 +60,7 @@ static void insert(struct Transaction_Linked_List *this, const struct Transactio
 	if (index == (this->size - 1)) {
 		this->tail->next = new_transaction_bucket;
 		this->tail = this->tail->next;
+		++(this->size);
 		return;
 	}
 
@@ -94,6 +108,7 @@ static void my_remove(struct Transaction_Linked_List *this, const struct Transac
 					prev->next = transaction_bucket->next;
 				}
 			}
+			--(this->size);
 			free(transaction_bucket);
 			return;
 		}

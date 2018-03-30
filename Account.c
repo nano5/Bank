@@ -26,12 +26,14 @@ struct Account *new_Account(char *account_holder, char *address, char *phone_num
 		account->balance = 0;
 		account->account_type = account_type;
 		account->delete_Account = &delete_Account;
+		account->transaction_linked_list = create_transaction_linked_list();
 		return account;
 	}
 	return NULL;
 }
 
 static void delete_Account(struct Account *this) {
+	this->transaction_linked_list->delete_transaction_linked_list(this->transaction_linked_list);
 	account_number_set->remove_account_number(account_number_set, this->account_number);
 	free(this->account_holder);
 	free(this->address);

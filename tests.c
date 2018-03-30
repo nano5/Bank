@@ -14,6 +14,7 @@ void remove_account_number();
 void insert();
 void add();
 void my_remove();
+void delete_transaction_linked_list();
 void assert(int result);
 
 int main() {
@@ -28,6 +29,7 @@ int main() {
 	insert();
 	add();
 	my_remove();
+	delete_transaction_linked_list();
 	return 0;
 }
 
@@ -113,6 +115,9 @@ void insert() {
 	transaction_linked_list->insert(transaction_linked_list, transaction1, 0);
 	transaction_linked_list->insert(transaction_linked_list, transaction2, 0);
 	transaction_linked_list->insert(transaction_linked_list, transaction3, 0);
+	transaction1->delete_transaction(transaction1);
+	transaction2->delete_transaction(transaction2);
+	transaction3->delete_transaction(transaction3);
 }
 
 void add() {
@@ -123,6 +128,9 @@ void add() {
 	transaction_linked_list->add(transaction_linked_list, transaction1);
 	transaction_linked_list->add(transaction_linked_list, transaction2);
 	transaction_linked_list->add(transaction_linked_list, transaction3);
+	transaction1->delete_transaction(transaction1);
+	transaction2->delete_transaction(transaction2);
+	transaction3->delete_transaction(transaction3);
 }
 
 void my_remove() {
@@ -136,5 +144,13 @@ void my_remove() {
 	transaction_linked_list->remove(transaction_linked_list, transaction1);
 	transaction_linked_list->remove(transaction_linked_list, transaction3);
 	transaction_linked_list->remove(transaction_linked_list, transaction2);
+	transaction1->delete_transaction(transaction1);
+	transaction2->delete_transaction(transaction2);
+	transaction3->delete_transaction(transaction3);
+}
+
+void delete_transaction_linked_list() {
+	struct Transaction_Linked_List *transaction_linked_list = create_transaction_linked_list();
+	transaction_linked_list->delete_transaction_linked_list(transaction_linked_list);
 }
 
